@@ -47,7 +47,7 @@ process.on('unhandledRejection', (error: Error) => {
     if (err && err.code === '28P01' && err.severity === 'FATAL') {
       console.error('unhandle the Rejection occured! shuttingdown',error.message);
     } else {
-      console.error("An error occurred while connecting to the database:", error.message);
+      //console.error("An error occurred while connecting to the database:", error.message);
     }
    
   process.exit(1);
