@@ -1,55 +1,33 @@
 import { getRepository } from 'typeorm';
 import { User  } from "../entity/persion";
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { asgnErrorHandling } from "../AsynError/asynError";
+
 import bcrypt from 'bcrypt';
 const saltRounds = 10;
 
 /// UserSign....
-export const UserSign = async (req: Request, res: Response) => {
-  try {
-    const { name, password, email, confirmpassword } = req.body;
-    const userRepository = getRepository(User);
-    const existingUser = await userRepository.findOne({
-      where: { email }
-    });
-    if (existingUser) {
-      return res.status(400).json({
-        message: "User with this email already exists"
-      });
-    } else {
-      if (!name || !password || !email || !confirmpassword) {
-        return res.status(400).json({
-          message: "Please fill all the fields"
-        });
-      }
-      if (password ===confirmpassword) {
-        bcrypt.hash(password, saltRounds,async (err, hashedPassword)=>{
-          if (err) {
-            console.error('Error hashing password:', err);
-            return res.status(500).json({ message: 'Internal server error' });
-          }else{
-            await userRepository.save({
-              username: name,
-              password:  hashedPassword,
-              email: email,
-              confirm_pasword: confirmpassword
-            });
-            return res.status(201).json({
-              message: "User created successfully"
-            });
-          }
-        })
-      } else {
-        return res.status(400).json({
-          message: "Passwords do not match",
-        });
-      }
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: 'Internal server error' });
+export const UserSign = asgnErrorHandling (async (req: Request, res: Response,next: NextFunction) => {
+  const userRepository = getRepository(User);
+  const {confirm_pasword,...rest}=req.body
+  const hashPassword = await bcrypt.hash(confirm_pasword,10)
+  const result = await userRepository.save({
+    ...rest,
+    confirm_pasword:hashPassword
+  })
+  if (result) {
+    res.json({
+      status:200,
+      message:"User Sign Success",
+      result:result
+    })
+  }else{
+    res.json({
+      status:400,
+      message:"User Sign Fail"
+    })
   }
-};
+})
 
 /// UserVerifications...
 export const UserVerified = async (req: Request, res: Response) => {

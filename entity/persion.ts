@@ -13,12 +13,15 @@ export class User {
   @Column({ length: 100 })
   password: string;
 
-  @Column({ length: 10 })
+  @Column({ length: 100 })
   confirm_pasword: string;
 
   @Column({ length: 30 })
   @IsEmail()
   email: string;
+
+  @Column({ type: 'bytea', nullable:true})
+  photo: Buffer;
 
   @Column({ default: false })
   verified: boolean;

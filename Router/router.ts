@@ -1,5 +1,5 @@
 const express = require("express");
-import { SortmoviesMiddlewareDetails, formDataValidatorMiddleware, handleValidationErrors,  } from "../controller/middlewareRouteHandler";
+import { SortmoviesMiddlewareDetails, formDataValidatorMiddleware, handleValidationErrors, userRegistrationFormMiddleware,  } from "../controller/middlewareRouteHandler";
 import { UserSign, UserVerified } from "../controller/User";
 import {
   CreateMovies,
@@ -20,7 +20,7 @@ import {
 } from "../controller/moviesDetails";
 
 const router = express.Router();
-router.route("/userRegiser").post(UserSign);
+router.route("/userRegiser").post(userRegistrationFormMiddleware,handleValidationErrors,UserSign);
 router.route("/userVerified").post(UserVerified);
 router.route("/createMovies").post(formDataValidatorMiddleware,handleValidationErrors,CreateMovies);
 router.route("/getallmovies").get(GetAllMovies);
