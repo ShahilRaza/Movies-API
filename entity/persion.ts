@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { IsEmail, Matches } from 'class-validator';
+import { Exclude } from "class-transformer";
 
 
 @Entity("User")
@@ -14,6 +15,7 @@ export class User {
   password: string;
 
   @Column({ length: 100 })
+  @Exclude()
   confirm_pasword: string;
 
   @Column({ length: 30 })
