@@ -1,13 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-  EventSubscriber,
-  EntitySubscriberInterface,
-  InsertEvent,
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from "typeorm";
 import { MovieDetails } from "./moviedeteils";
 
 @Entity("Movies")
@@ -36,6 +27,3 @@ export class Movie {
   @OneToOne(() => MovieDetails, (details) => details.movie, { cascade: true })
   details: MovieDetails;
 }
-
-
-

@@ -1,13 +1,11 @@
 import { Movie } from "../entity/movies";
 import { NextFunction, Request, Response, query } from "express";
-import { Like, getRepository } from "typeorm";
-import { CustomErrorHanding, } from "../CustomError/CustomError";
+import { getRepository } from "typeorm";
+import { CustomErrorHanding } from "../CustomError/CustomError";
 import { asgnErrorHandling } from "../AsynError/asynError";
 
-
-
-
-export const CreateMovies = asgnErrorHandling(async (req: Request, res: Response,next: NextFunction) => {
+export const CreateMovies = asgnErrorHandling(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { title, name, duration, rating, description } = req.body;
     const moviesRepository = getRepository(Movie);
     const existingMovie = await moviesRepository.findOne({
@@ -25,14 +23,14 @@ export const CreateMovies = asgnErrorHandling(async (req: Request, res: Response
       const result = await moviesRepository.save(newMovie);
       res.status(201).json(result);
     } else {
-      const error= new CustomErrorHanding("Movie already exists", 409);
+      const error = new CustomErrorHanding("Movie already exists", 409);
       next(error);
     }
-  
-})
+  }
+);
 
-
-export const GetAllMovies = asgnErrorHandling(async (req: Request, res: Response, next: NextFunction) => {
+export const GetAllMovies = asgnErrorHandling(
+  async (req: Request, res: Response, next: NextFunction) => {
     const moviesRepository = getRepository(Movie);
     const getAllmovies = await moviesRepository.find();
     res.status(200).json({
@@ -42,16 +40,14 @@ export const GetAllMovies = asgnErrorHandling(async (req: Request, res: Response
     if (!getAllmovies) {
       const error = new CustomErrorHanding("No movie found", 404);
       next(error);
-    }else{
-      return getAllmovies
+    } else {
+      return getAllmovies;
     }
-})
+  }
+);
 
-
-
-
-
-export const GetbyIdMovies = asgnErrorHandling(async (req: Request, res: Response, next: NextFunction) => {
+export const GetbyIdMovies = asgnErrorHandling(
+  async (req: Request, res: Response, next: NextFunction) => {
     const movieId = req.params.id;
     const moviesRepository = getRepository(Movie);
     const getAllmovies = await moviesRepository.findOne({
@@ -60,57 +56,59 @@ export const GetbyIdMovies = asgnErrorHandling(async (req: Request, res: Respons
       },
     });
     if (!getAllmovies) {
-       const error =new CustomErrorHanding('not found', 404);
-       next(error)
+      const error = new CustomErrorHanding("not found", 404);
+      next(error);
     } else {
       res.status(200).json(getAllmovies);
     }
-  
-})
+  }
+);
 
-
-export const DeletebyIdMovies = asgnErrorHandling(async (req: Request, res: Response, next: NextFunction) => {
+export const DeletebyIdMovies = asgnErrorHandling(
+  async (req: Request, res: Response, next: NextFunction) => {
     const movieId = req.params.id;
     const moviesRepository = getRepository(Movie);
     const movie = await moviesRepository.findOneBy({ id: movieId });
     if (!movie) {
-      const error =new CustomErrorHanding('not found', 404);
-      next(error)
-    }else{
-      await moviesRepository.remove(movie);
-      res.status(200).json({ message: `Movie with id ${movieId} deleted successfully` });
-    }
-  })
-  
-
-
-
-
-export const updateMovies = async (req: Request, res: Response, next: NextFunction) => {
-    const movieId = req.params.id;
-    const updatedata = req.body;
-    const { title, name, duration, rating, description } = req.body;
-    const moviesRepository = getRepository(Movie);
-    const checkMovieExist = await moviesRepository.findOne({
-      where: { id: movieId },
-    });
-    if (!checkMovieExist) {
-      const error =new CustomErrorHanding('not found', 404);
-      return next(error);
+      const error = new CustomErrorHanding("not found", 404);
+      next(error);
     } else {
-      const newData = await moviesRepository.update(movieId, {
-        title,
-        name,
-        duration,
-        rating,
-        description,
-      });
-      const data = { ...newData.raw };
-      res.status(201).json({
-        message: "Update Successfully",
-      });
+      await moviesRepository.remove(movie);
+      res
+        .status(200)
+        .json({ message: `Movie with id ${movieId} deleted successfully` });
     }
-  
+  }
+);
+
+export const updateMovies = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const movieId = req.params.id;
+  const updatedata = req.body;
+  const { title, name, duration, rating, description } = req.body;
+  const moviesRepository = getRepository(Movie);
+  const checkMovieExist = await moviesRepository.findOne({
+    where: { id: movieId },
+  });
+  if (!checkMovieExist) {
+    const error = new CustomErrorHanding("not found", 404);
+    return next(error);
+  } else {
+    const newData = await moviesRepository.update(movieId, {
+      title,
+      name,
+      duration,
+      rating,
+      description,
+    });
+    const data = { ...newData.raw };
+    res.status(201).json({
+      message: "Update Successfully",
+    });
+  }
 };
 
 export const searchmovies = async (req: Request, res: Response) => {
@@ -151,6 +149,8 @@ export const filtermovies = async (req: Request, res: Response) => {
     const moviesRepository = getRepository(Movie);
   } catch (error) {
     const err = new CustomErrorHanding(error.message, error.statusCode || 500);
-    return res.status(err.statusCode).json({ status: err.status, message: err.message });
+    return res
+      .status(err.statusCode)
+      .json({ status: err.status, message: err.message });
   }
 };

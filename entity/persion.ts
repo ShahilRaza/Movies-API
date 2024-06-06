@@ -1,12 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { IsEmail, Matches } from 'class-validator';
+import { IsEmail, Matches } from "class-validator";
 import { Exclude } from "class-transformer";
-
 
 @Entity("User")
 export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column({ length: 250 })
   username: string;
@@ -22,7 +21,7 @@ export class User {
   @IsEmail()
   email: string;
 
-  @Column({ type: 'bytea', nullable:true})
+  @Column({ type: "bytea", nullable: true })
   photo: Buffer;
 
   @Column({ default: false })
