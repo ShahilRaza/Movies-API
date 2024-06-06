@@ -1,9 +1,10 @@
 import { MovieDetails } from "../entity/moviedeteils";
-import { Movie } from "../entity/movies";
 import { Request, Response } from "express";
-import { FindManyOptions, getRepository,Not, MoreThan, ILike, MoreThanOrEqual } from "typeorm";
-import { GetbyIdMovies } from "./movies";
-import {Apifeatures} from "../Utils/ApisFeatures"
+import {
+  FindManyOptions,
+  getRepository,
+} from "typeorm";
+
 
 export const CreateMoviesDetails = async (req: Request, res: Response) => {
   try {
@@ -45,7 +46,6 @@ export const CreateMoviesDetails = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 
 export const SortrmoviesDetails = async (req: Request, res: Response) => {
   try {
@@ -107,8 +107,6 @@ export const LimiteFieldmoviesDetails = async (req: Request, res: Response) => {
   }
 };
 
-
-
 export const paginationmoviesDetails = async (req: Request, res: Response) => {
   try {
     const { page = 1, limit = 10 } = req.query;
@@ -135,56 +133,63 @@ export const paginationmoviesDetails = async (req: Request, res: Response) => {
   }
 };
 
-
 /// impliment aggregation pipe line for movidetais controller
 
-
-export const AggregationPipelineforMovidetais = async (req: Request, res: Response) => {
+export const AggregationPipelineforMovidetais = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const moviesDetailsRepository = getRepository(MovieDetails);
     const results = await moviesDetailsRepository
-      .createQueryBuilder('movieDetails')
-      .where('movieDetails.totalRating > :rating', {rating: parseFloat("4") })
+      .createQueryBuilder("movieDetails")
+      .where("movieDetails.totalRating > :rating", { rating: parseFloat("4") })
       .select([
-        'AVG(movieDetails.totalRating) as averageRating',
-        'AVG(movieDetails.price) as averagePrice',
-        'MIN(movieDetails.price) as minPrice',
-        'MAX(movieDetails.price) as mxPrice',
-        'SUM(movieDetails.price) as totalPrice',
+        "AVG(movieDetails.totalRating) as averageRating",
+        "AVG(movieDetails.price) as averagePrice",
+        "MIN(movieDetails.price) as minPrice",
+        "MAX(movieDetails.price) as mxPrice",
+        "SUM(movieDetails.price) as totalPrice",
       ])
-      .groupBy('movieDetails.releaseYear')
-      .addOrderBy(' averageRating', 'ASC') 
-      .getRawMany()
-      return res.status(200).json({
-        status:"Success",
-        data:{results}
-      });
+      .groupBy("movieDetails.releaseYear")
+      .addOrderBy(" averageRating", "ASC")
+      .getRawMany();
+    return res.status(200).json({
+      status: "Success",
+      data: { results },
+    });
   } catch (error) {
     console.error("Error executing query:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
 
-
 export const getmoviesbygenre = async (req: Request, res: Response) => {
   try {
-    const genre = req.params.genre
+    const genre = req.params.genre;
     const moviesDetailsRepository = getRepository(MovieDetails);
     const result = await moviesDetailsRepository
-  .createQueryBuilder("movieDetails")
-  .leftJoinAndSelect("movieDetails.movie", "movie")
-  .where("movie.genre = :genre", { genre }) 
-  .addSelect(["movie.id", "movie.title", "movie.genre"]) 
-  .addSelect(["movieDetails.totalRating", "movieDetails.releaseDate", "movieDetails.releaseYear"])
-  .addSelect(["movieDetails.directorName", "movieDetails.actorName", "movieDetails.coverImage", "movieDetails.price"])
-  .getMany();
-  return res.status(200).json({
-    status:"Success",
-    data:{result}
-  });
+      .createQueryBuilder("movieDetails")
+      .leftJoinAndSelect("movieDetails.movie", "movie")
+      .where("movie.genre = :genre", { genre })
+      .addSelect(["movie.id", "movie.title", "movie.genre"])
+      .addSelect([
+        "movieDetails.totalRating",
+        "movieDetails.releaseDate",
+        "movieDetails.releaseYear",
+      ])
+      .addSelect([
+        "movieDetails.directorName",
+        "movieDetails.actorName",
+        "movieDetails.coverImage",
+        "movieDetails.price",
+      ])
+      .getMany();
+    return res.status(200).json({
+      status: "Success",
+      data: { result },
+    });
   } catch (error) {
     console.error("Error executing query:", error);
-    
   }
 };
-
