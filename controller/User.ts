@@ -1,5 +1,5 @@
 import { getRepository } from "typeorm";
-import { User } from "../entity/persion";
+import { User, UserRole } from "../entity/persion";
 import { NextFunction, Request, Response } from "express";
 import { asgnErrorHandling } from "../AsynError/asynError";
 import bcrypt from "bcrypt";
@@ -7,8 +7,8 @@ import jwt from "jsonwebtoken";
 
 const saltRounds = 10;
 
-export const JwtToken = (id) => {
-  return jwt.sign({ id }, process.env.SECRETE_KEY, {
+export const JwtToken = (id, role) => {
+  return jwt.sign({ id, role }, process.env.SECRETE_KEY, {
     expiresIn: process.env.TokenExpire,
   });
 };
@@ -17,14 +17,23 @@ export const JwtToken = (id) => {
 export const UserSigup = asgnErrorHandling(
   async (req: Request, res: Response, next: NextFunction) => {
     const userRepository = getRepository(User);
-    const { confirm_pasword, ...rest } = req.body;
+    const { confirm_pasword, role, ...rest } = req.body;
     const hashPassword = await bcrypt.hash(confirm_pasword, 10);
+    if (role && !Object.values(UserRole).includes(role)) {
+      return res.status(400).json({
+        status: 400,
+        message: `Invalid role value. Allowed values are: ${Object.values(
+          UserRole
+        ).join(", ")}`,
+      });
+    }
     const result = await userRepository.save({
       ...rest,
       confirm_pasword: hashPassword,
+      role: role || "user",
     });
     if (result) {
-      const jwtToken = await JwtToken(result.id);
+      const jwtToken = await JwtToken(result.id, result.role);
       res.json({
         status: 200,
         message: "User Sign Success",
@@ -51,9 +60,10 @@ export const loginUser = asgnErrorHandling(
       },
     });
     if (user) {
+      console.log(user, "hasi");
       const isMatch = await bcrypt.compare(password, user.confirm_pasword);
       if (isMatch) {
-        const jwtToken = await JwtToken(user.id);
+        const jwtToken = await JwtToken(user.id, user.role);
         res.json({
           status: 200,
           message: "Login Success",
