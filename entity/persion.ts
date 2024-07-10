@@ -2,6 +2,15 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { IsEmail, Matches } from "class-validator";
 import { Exclude } from "class-transformer";
 
+
+
+export enum UserRole {
+  ADMIN = 'admin',
+  SUPER_ADMIN = 'superAdmin',
+  USER = 'user',
+}
+
+
 @Entity("User")
 export class User {
   @PrimaryGeneratedColumn("uuid")
@@ -24,6 +33,15 @@ export class User {
   @Column({ type: "bytea", nullable: true })
   photo: Buffer;
 
+  @Column({
+    type: "enum",
+    enum: UserRole,
+    default: UserRole.USER,
+    nullable: false,
+  })
+  role: UserRole;
+
+ 
   @Column({ default: false })
   verified: boolean;
 }

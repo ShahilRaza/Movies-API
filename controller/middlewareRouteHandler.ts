@@ -1,9 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import {
-  ValidationChain,
-  body,
-  validationResult,
-} from "express-validator";
+
+import { ValidationChain, body, validationResult } from "express-validator";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { getRepository } from "typeorm";
 import { User } from "../entity/persion";
@@ -68,6 +65,32 @@ export const protectRoute = async (
       status: "Fail",
       message: "You are not logged in! Please log in to get access",
     });
+  }
+};
+
+export const checkRoleOfUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.SECRETE_KEY);
+    if (!decoded || typeof decoded !== "object" || !("role" in decoded)) {
+      return res
+        .status(403)
+        .json({ message: "Forbidden: No role found in token." });
+    }
+    const role = (decoded as any).role;
+    if (!["admin", "superAdmin"].includes(role)) {
+      return res
+        .status(403)
+        .json({ message: "Forbidden: You don't have the required role." });
+    }
+    next();
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    res.status(401).json({ message: "Unauthorized" });
   }
 };
 
