@@ -1,14 +1,14 @@
 const express = require("express");
 import {
-  SortmoviesMiddlewareDetails,
   checkRoleOfUser,
   formDataValidatorMiddleware,
   handleValidationErrors,
+  passwordValidations,
   protectRoute,
   userLogin,
   userRegistrationFormMiddleware,
 } from "../controller/middlewareRouteHandler";
-import { loginUser, UserSigup, UserVerified,} from "../controller/User";
+import { loginUser, UserSigup, changePassword,} from "../controller/User";
 import {
   CreateMovies,
   DeletebyIdMovies,
@@ -32,15 +32,15 @@ router
   .route("/userRegiser")
   .post(userRegistrationFormMiddleware, handleValidationErrors, UserSigup);
 router.route("/userlogin").post(userLogin, loginUser,handleValidationErrors, );
-router.route("/userVerified").post(UserVerified);
+router.route("/changePassword").post(passwordValidations ,protectRoute, changePassword);
 router
   .route("/createMovies")
   .post(formDataValidatorMiddleware, handleValidationErrors, CreateMovies);
 router.route("/getallmovies").get(protectRoute, checkRoleOfUser, GetAllMovies);
-router.route("/getbyIdmovies/:id").get(protectRoute, GetbyIdMovies);
-router.route("/deletebyIdmovies/:id").delete(protectRoute, DeletebyIdMovies);
-router.route("/upadatedmovies/:id").put(protectRoute, updateMovies);
-router.route("/searchmovies/").get(protectRoute, searchmovies);
+router.route("/getbyIdmovies/:id").get(protectRoute,checkRoleOfUser, GetbyIdMovies);
+router.route("/deletebyIdmovies/:id").delete(protectRoute, checkRoleOfUser,DeletebyIdMovies);
+router.route("/upadatedmovies/:id").put(protectRoute,checkRoleOfUser, updateMovies);
+router.route("/searchmovies/").get(protectRoute,checkRoleOfUser, searchmovies);
 router.route("/filtermovies/").get(protectRoute, filtermovies);
 
 ///# CreateMoviesDetails Routers

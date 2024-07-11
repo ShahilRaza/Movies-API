@@ -138,6 +138,22 @@ export const userLogin: ValidationChain[] = [
     .withMessage("Password must be at least 6 characters long"),
 ];
 
+
+export const passwordValidations: ValidationChain[] = [
+  body("oldPassword")
+    .isString()
+    .withMessage("Old password must be a string")
+    .notEmpty()
+    .withMessage("Old password is required"),
+  body("newPassword")
+    .isLength({ min: 6, max: 10 })
+    .withMessage("Password must be between 6 and 10 characters long")
+    .notEmpty()
+    .withMessage("New password is required"),
+];
+
+
+
 export const handleValidationErrors = (
   req: Request,
   res: Response,
