@@ -3,8 +3,8 @@
     "host": "localhost",
     "port": 5432,
     "username": "postgres",
-    "password": "Shariq@123",
-    "database": "India",
+    "password": "shariq@123",
+    "database": "MyMoviesData",
     "synchronize": true,
     "entities": ["./entity/*.ts"],
     "name": "default"
